@@ -13,7 +13,11 @@ import {
   Plus, 
   BarChart3,
   LogOut,
-  User
+  User,
+  MessageCircle,
+  Wind,
+  Eye,
+  Phone
 } from 'lucide-react'
 
 interface PatientDashboardProps {
@@ -258,11 +262,86 @@ export function PatientDashboard({
         </Card>
       </motion.div>
 
-      {/* Wellness Tips */}
+      {/* Mental Health Support */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
+      >
+        <Card className="bg-gradient-to-r from-rose-50 to-pink-50 border-rose-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-rose-800">
+              <MessageCircle className="w-5 h-5" />
+              Mental Health Support
+            </CardTitle>
+            <CardDescription>
+              Your AI companion is always here to help with support, exercises, and resources
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-white/60 rounded-lg text-center">
+                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Wind className="w-6 h-6 text-rose-600" />
+                </div>
+                <h4 className="font-medium text-rose-700 mb-2">Breathing Exercises</h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  Guided breathing techniques to reduce stress and anxiety
+                </p>
+                <Button size="sm" variant="outline" className="text-rose-600 border-rose-300 hover:bg-rose-50">
+                  Try Now
+                </Button>
+              </div>
+              
+              <div className="p-4 bg-white/60 rounded-lg text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Eye className="w-6 h-6 text-blue-600" />
+                </div>
+                <h4 className="font-medium text-blue-700 mb-2">Grounding Techniques</h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  5-4-3-2-1 grounding exercise for anxiety relief
+                </p>
+                <Button size="sm" variant="outline" className="text-blue-600 border-blue-300 hover:bg-blue-50">
+                  Start Exercise
+                </Button>
+              </div>
+              
+              <div className="p-4 bg-white/60 rounded-lg text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Phone className="w-6 h-6 text-green-600" />
+                </div>
+                <h4 className="font-medium text-green-700 mb-2">Crisis Resources</h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  Immediate help and professional support resources
+                </p>
+                <Button size="sm" variant="outline" className="text-green-600 border-green-300 hover:bg-green-50">
+                  View Resources
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-4 bg-white/80 rounded-lg border border-rose-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-rose-600" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-rose-800">Need immediate support?</h4>
+                  <p className="text-sm text-rose-700">
+                    Click the chat button in the bottom right corner to talk with your AI mental health companion.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Wellness Tips */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.8 }}
       >
         <Card className="bg-gradient-to-r from-calm-50 to-mint/20 border-calm-200">
           <CardHeader>

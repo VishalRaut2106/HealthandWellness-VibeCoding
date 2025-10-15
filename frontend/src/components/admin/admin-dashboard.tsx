@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import { 
   Users, 
   TrendingUp, 
@@ -15,7 +16,18 @@ import {
   CheckCircle,
   BarChart3,
   Eye,
-  UserCheck
+  UserCheck,
+  Search,
+  Filter,
+  Download,
+  Settings,
+  Mail,
+  Phone,
+  MessageCircle,
+  Shield,
+  Activity,
+  Clock,
+  Star
 } from 'lucide-react'
 
 interface ClientData {
@@ -41,6 +53,9 @@ export function AdminDashboard() {
   const [clients, setClients] = useState<ClientData[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedClient, setSelectedClient] = useState<ClientData | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'needs_attention' | 'inactive'>('all')
+  const [activeTab, setActiveTab] = useState<'overview' | 'clients' | 'analytics' | 'settings'>('overview')
 
   // Mock data for demonstration
   useEffect(() => {
@@ -141,6 +156,13 @@ export function AdminDashboard() {
     }
   }
 
+  const filteredClients = clients.filter(client => {
+    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          client.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesFilter = filterStatus === 'all' || client.status === filterStatus
+    return matchesSearch && matchesFilter
+  })
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -157,8 +179,58 @@ export function AdminDashboard() {
         <p className="text-lg text-gray-600">Monitor client progress and mental health insights</p>
       </div>
 
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Navigation Tabs */}
+      <div className="flex flex-wrap gap-2 justify-center">
+        {[
+          { id: 'overview', label: 'Overview', icon: BarChart3 },
+          { id: 'clients', label: 'Clients', icon: Users },
+          { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+          { id: 'settings', label: 'Settings', icon: Settings }
+        ].map((tab) => (
+          <Button
+            key={tab.id}
+            variant={activeTab === tab.id ? 'default' : 'outline'}
+            onClick={() => setActiveTab(tab.id as any)}
+            className="flex items-center gap-2"
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </Button>
+        ))}
+      </div>
+
+      {/* Search and Filter */}
+      {activeTab === 'clients' && (
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search clients..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div className="flex gap-2">
+            {['all', 'active', 'needs_attention', 'inactive'].map((status) => (
+              <Button
+                key={status}
+                variant={filterStatus === status ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus(status as any)}
+              >
+                {status.replace('_', ' ')}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Overview Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
@@ -222,9 +294,45 @@ export function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Clients List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {clients.map((client) => (
+          {/* Recent Activity */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="w-5 h-5" />
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { action: 'New client registered', user: 'Sarah Wilson', time: '2 hours ago', type: 'success' },
+                  { action: 'Mood alert triggered', user: 'John Doe', time: '4 hours ago', type: 'warning' },
+                  { action: 'Weekly report generated', user: 'System', time: '1 day ago', type: 'info' },
+                  { action: 'Client completed goal', user: 'Mike Johnson', time: '2 days ago', type: 'success' }
+                ].map((activity, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className={`w-2 h-2 rounded-full ${
+                      activity.type === 'success' ? 'bg-green-500' :
+                      activity.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                    }`} />
+                    <div className="flex-1">
+                      <p className="font-medium">{activity.action}</p>
+                      <p className="text-sm text-gray-600">{activity.user}</p>
+                    </div>
+                    <span className="text-sm text-gray-500">{activity.time}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {activeTab === 'clients' && (
+        <>
+          {/* Clients List */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredClients.map((client) => (
           <motion.div
             key={client.id}
             initial={{ opacity: 0, y: 20 }}
@@ -280,7 +388,138 @@ export function AdminDashboard() {
             </Card>
           </motion.div>
         ))}
-      </div>
+          </div>
+        </>
+      )}
+
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Platform Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-3xl font-bold text-blue-600">1,247</div>
+                  <div className="text-sm text-gray-600">Total Users</div>
+                  <div className="text-xs text-green-600">+12% this month</div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-3xl font-bold text-green-600">8,934</div>
+                  <div className="text-sm text-gray-600">Mood Entries</div>
+                  <div className="text-xs text-green-600">+23% this month</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-3xl font-bold text-purple-600">73%</div>
+                  <div className="text-sm text-gray-600">Positive Moods</div>
+                  <div className="text-xs text-green-600">+5% this month</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="w-5 h-5" />
+                AI Insights Generated
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span>Positive Trend Detections</span>
+                  <Badge className="bg-green-100 text-green-800">342</Badge>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span>Pattern Recognition</span>
+                  <Badge className="bg-blue-100 text-blue-800">156</Badge>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span>Crisis Interventions</span>
+                  <Badge className="bg-red-100 text-red-800">23</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'settings' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                System Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Email Notifications</p>
+                    <p className="text-sm text-gray-600">Send email alerts for important events</p>
+                  </div>
+                  <Button variant="outline" size="sm">Configure</Button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Crisis Detection</p>
+                    <p className="text-sm text-gray-600">AI-powered crisis intervention settings</p>
+                  </div>
+                  <Button variant="outline" size="sm">Configure</Button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Data Retention</p>
+                    <p className="text-sm text-gray-600">Manage data retention policies</p>
+                  </div>
+                  <Button variant="outline" size="sm">Configure</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Security & Privacy
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Data Encryption</p>
+                    <p className="text-sm text-gray-600">AES-256 encryption enabled</p>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800">Active</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Access Logs</p>
+                    <p className="text-sm text-gray-600">Monitor system access</p>
+                  </div>
+                  <Button variant="outline" size="sm">View Logs</Button>
+                </div>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Backup Status</p>
+                    <p className="text-sm text-gray-600">Last backup: 2 hours ago</p>
+                  </div>
+                  <Badge className="bg-green-100 text-green-800">Up to Date</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Client Details Modal */}
       {selectedClient && (
